@@ -4,7 +4,9 @@
 #include <vector>
 #include <stack>
 #include <string>
+#include <string.h>
 #include <assert.h>
+#include <fstream>
 
 using namespace std;
 #define arrLen(arr) ( sizeof(arr) / sizeof(arr[0]) )
@@ -172,6 +174,36 @@ public:
     static bool isOperand(char c) {
         return (('0' <= c) && (c <= '9')) || (('A' <= c) && (c <= 'Z')) || (('a' <= c) && (c <= 'z'));
     }
+
+    static void print(vector<vector<int>>& ret) {
+        for (int i = 0; i < ret.size(); i++) {
+            vector<int> row = ret.at(i);
+            for (int j = 0; j < row.size(); j++) {
+                cout << row.at(j) << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    static void readIntArray(vector<vector<int>>& ret) {
+        freopen("D:\\other_cjwlaptop\\install\\cppAlgorithm\\data\\in.txt","r", stdin);
+        int r, c;
+        cin >> r >> c;
+        cin.get(); // skip the <Enter>
+        for (int i = 0; i < r; i++) {
+            string line;
+            getline(cin, line);
+            istringstream iss(line);
+            string token;
+
+            vector<int> intRow;
+            while (getline(iss, token, ' ')) {
+                intRow.push_back(atoi(token.c_str()));
+            }
+            ret.push_back(intRow);
+        }
+        fclose(stdin);
+    }
 };
 
 class CalcExp {
@@ -297,44 +329,78 @@ public:
 
 class Calc24 {
 
-    public:
-        void calc24(string s) {
-            ChangeInfixToSuffix changeInfixToSuffix;
-            string suffix = changeInfixToSuffix.changeInfixToSuffix(s);
+public:
+    void calc24(string s) {
+        ChangeInfixToSuffix changeInfixToSuffix;
+        string suffix = changeInfixToSuffix.changeInfixToSuffix(s);
 //            cout << "suffix: " << suffix << endl;
 
-            int ret = CalcExp::calcExp(suffix);
-            cout << "calc exp: " << ret << endl;
-        }
+        int ret = CalcExp::calcExp(suffix);
+        cout << "calc exp: " << ret << endl;
+    }
+public:
+    static void test() {
+        Calc24 calc24;
+        calc24.calc24("3+2-1");             // 4
+        calc24.calc24("3-2+1");             // 2
+        calc24.calc24("(3+2)-1*0+(5)");     // 10
 
+        calc24.calc24("2+(5)");             // 7
+        calc24.calc24("(3+2)+(5))");        // 10
+        calc24.calc24("(3+2)-(5))");        // 0
+        calc24.calc24("(3+2)-1*0");         // 5
+        calc24.calc24("9+(8-7)*6+5/4+(3+2)-1*0+(5)");   // 26
+        calc24.calc24("9+(8-7)*6+5/4");     // 116
+        calc24.calc24("A+(B-C/D)*E");
+        calc24.calc24("1-(2+3)");           // -4
+        calc24.calc24("a+b*c");
+        calc24.calc24("a*b+c");
+    }
+};
+
+//    http://ymsy.openjudge.cn/jyh/01/
+/*
+输入
+输入的第一行表示区域的行数R和列数C(1 <= R,C <= 100)。下面是R行，每行有C个整数，代表高度h，0<=h<=10000。
+输出
+输出最长区域的长度。
+
+5 5
+1 2 3 4 5
+16 17 18 19 6
+15 24 25 20 7
+14 23 22 21 8
+13 12 11 10 9
+*/
+class snow_01 {
+public:
+    static void run(vector<vector<int>>& data) {
+        cout << "snow_01" << endl;
+        Tools::print(data);
+    }
+    static void test() {
+        vector<vector<int>> input;
+        Tools::readIntArray(input);
+
+        snow_01().run(input);
+    }
 };
 
 int main(int argc, char** argv) {
+
+    snow_01::test();
+
 //	float f = test();
 //	testVector();
 
-    Calc24 calc24;
-    calc24.calc24("3+2-1");             // 4
-    calc24.calc24("3-2+1");             // 2
-    calc24.calc24("(3+2)-1*0+(5)");     // 10
-
-    calc24.calc24("2+(5)");             // 7
-    calc24.calc24("(3+2)+(5))");        // 10
-    calc24.calc24("(3+2)-(5))");        // 0
-    calc24.calc24("(3+2)-1*0");         // 5
-    calc24.calc24("9+(8-7)*6+5/4+(3+2)-1*0+(5)");   // 26
-    calc24.calc24("9+(8-7)*6+5/4");     // 116
-    calc24.calc24("A+(B-C/D)*E");
-    calc24.calc24("1-(2+3)");           // -4
-    calc24.calc24("a+b*c");
-    calc24.calc24("a*b+c");
-
-    testStack();
+//    testStack();
 
 //	cout << matchBracket("((((( abc ))))())") << endl;
 //	string str;
 //	cin >> str;
 //	cout << matchBracket(str) << endl;
+
+//    Calc24::test();
 
     return 0;
 }
