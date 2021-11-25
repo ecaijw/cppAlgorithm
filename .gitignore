@@ -1,6 +1,14 @@
 .idea/
 cmake-build-debug/
 
+# jingwei
+*.dev
+*.ico
+*_private.*
+*.layout
+Makefile.win
+
+
 # Prerequisites
 *.d
 
