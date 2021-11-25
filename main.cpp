@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <fstream>
 #include <filesystem>
+#include <algorithm>
 
 using namespace std;
 #define arrLen(arr) ( sizeof(arr) / sizeof(arr[0]) )
@@ -175,7 +176,7 @@ public:
         return (('0' <= c) && (c <= '9')) || (('A' <= c) && (c <= 'Z')) || (('a' <= c) && (c <= 'z'));
     }
 
-    static void print(vector<vector<int>>& ret) {
+    static void print(const vector<vector<int>>& ret) {
         for (int i = 0; i < ret.size(); i++) {
             vector<int> row = ret.at(i);
             for (int j = 0; j < row.size(); j++) {
@@ -183,6 +184,13 @@ public:
             }
             cout << endl;
         }
+    }
+
+    static void print(const vector<int>& v) {
+        for (int j = 0; j < v.size(); j++) {
+            cout << v.at(j) << " ";
+        }
+        cout << endl;
     }
 
     static void readIntArray(vector<vector<int>>& ret) {
@@ -225,7 +233,7 @@ public:
 
 class CalcExp {
 private:
-    static int calc2Nums(char c, int n1, int n2) {
+    static float calc2Nums(char c, float n1, float n2) {
         if (c == '*') return n1 * n2;
         if (c == '/') return n1 / n2;
         if (c == '+') return n1 + n2;
@@ -235,22 +243,22 @@ private:
     }
 
 public:
-    static int calcExp(string s) {
+    static float calcExp(string s) {
         if (s.empty()) {
             return 0;
         }
 
-        stack<int> st;
+        stack<float> st;
 
         for (int i = 0; i < s.length() ; i++) {
             char c = s[i];
             if (Tools::isOperand(c)) {
-                st.push(c - '0');
+                st.push((float)(c - '0'));
             } else {
                 // calc the result, and then push to the stack
-                int num1 = st.top();
+                float num1 = st.top();
                 st.pop();
-                int num2 = st.top();
+                float num2 = st.top();
                 st.pop();
                 st.push(CalcExp::calc2Nums(c, num2, num1));
             }
@@ -320,6 +328,9 @@ public:
                 // pop symbols: until not <
                 while (!st.empty()) {
                     top = st.top();
+                    if (top == '(') {
+                        break;
+                    }
                     if (!(getOperatorInt(c) <= getOperatorInt(top))) {
                         break;
                     }
@@ -344,34 +355,162 @@ public:
 
 };
 
-class Calc24 {
-
+class CreateFullPermutation {
+private:
+    vector<int> mNumArray = vector<int>();
+    vector<int> mLast = vector<int>();
 public:
-    void calc24(string s) {
+    void init(const vector<int>& numArray) {
+        mNumArray = numArray;
+    }
+    void getFirst(vector<int>& nextNumArray) {
+        mLast.resize(mNumArray.size(), 0);
+        nextNumArray.assign(mLast.begin(), mLast.end());
+    }
+
+    bool getNext(vector<int>& nextNumArray) {
+        // from the low digit, add 1 each time.
+        int i = mLast.size() - 1;
+        for (; i >= 0; i--) {
+            mLast[i] += 1;
+            if (mLast[i] == mNumArray[i]) {
+                // 进位
+                mLast[i] = 0;
+            } else {
+                // find the next
+                nextNumArray.assign(mLast.begin(), mLast.end());
+                return true;
+            }
+        }
+        if (i < 0) {
+            // return value should not be used
+            return false; // no more to return
+        }
+        assert(false); // should not reach here
+        return false;
+    }
+
+    static void testOne(const vector<int>& oneData) {
+        cout << "testOne" << endl;
+        Tools::print(oneData);
+
+        CreateFullPermutation creator;
+        creator.init(oneData);
+        vector<int> numArray;
+        creator.getFirst(numArray);
+        Tools::print(numArray);
+        while (creator.getNext(numArray)) {
+            Tools::print(numArray);
+        }
+    }
+    static void test() {
+        testOne({1, 1, 1});
+        testOne({3, 3, 3});
+        testOne({3, 2, 1});
+        testOne({2, 4, 3, 2});
+    }
+};
+
+//    https://leetcode-cn.com/problems/24-game/
+class Calc24 {
+public:
+    void calcStringExp(string s) {
         ChangeInfixToSuffix changeInfixToSuffix;
         string suffix = changeInfixToSuffix.changeInfixToSuffix(s);
 //            cout << "suffix: " << suffix << endl;
 
-        int ret = CalcExp::calcExp(suffix);
+        float ret = CalcExp::calcExp(suffix);
         cout << "calc exp: " << ret << endl;
     }
-public:
-    static void test() {
-        Calc24 calc24;
-        calc24.calc24("3+2-1");             // 4
-        calc24.calc24("3-2+1");             // 2
-        calc24.calc24("(3+2)-1*0+(5)");     // 10
 
-        calc24.calc24("2+(5)");             // 7
-        calc24.calc24("(3+2)+(5))");        // 10
-        calc24.calc24("(3+2)-(5))");        // 0
-        calc24.calc24("(3+2)-1*0");         // 5
-        calc24.calc24("9+(8-7)*6+5/4+(3+2)-1*0+(5)");   // 26
-        calc24.calc24("9+(8-7)*6+5/4");     // 116
-        calc24.calc24("A+(B-C/D)*E");
-        calc24.calc24("1-(2+3)");           // -4
-        calc24.calc24("a+b*c");
-        calc24.calc24("a*b+c");
+    bool calc24(const vector<int>& cards) {
+        // exp: (3*(4)*(5)*6)
+        //      0/12/345/67/8
+        //      2442324222412
+        //      数字4*3*2  *  运算符4*4*4  *  括号2*2*2*2*2*2
+        const vector<char> OPERATOR({'+', '-', '*', '/'});
+        CreateFullPermutation creator;
+        creator.init({2, 4, 2, 2, 4, 2, 2, 4, 2});
+        vector<int> numArray;
+        creator.getFirst(numArray);
+        while (creator.getNext(numArray)) {
+//            Tools::print(numArray);
+            int cardPos [] = {0, 1, 2, 3};
+            do {
+                string exp;
+                if (numArray[0] == 1) {
+                    exp.push_back('(');
+                }
+                exp.push_back((char)(cards[cardPos[0]] + '0'));
+                exp.push_back(OPERATOR[numArray[1]]);
+                if (numArray[2] == 1) {
+                    exp.push_back('(');
+                }
+                exp.push_back((char)(cards[cardPos[1]] + '0'));
+                if (numArray[3] == 1) {
+                    exp.push_back(')');
+                }
+                exp.push_back(OPERATOR[numArray[4]]);
+                if (numArray[5] == 1) {
+                    exp.push_back('(');
+                }
+                exp.push_back((char)(cards[cardPos[2]] + '0'));
+                if (numArray[6] == 1) {
+                    exp.push_back(')');
+                }
+                exp.push_back(OPERATOR[numArray[7]]);
+                exp.push_back((char)(cards[cardPos[3]] + '0'));
+                if (numArray[8] == 1) {
+                    exp.push_back(')');
+                }
+
+                // handle one expression
+                if (!matchBracket(exp)) {
+//                    cout << exp << endl;
+                    continue;
+                }
+                ChangeInfixToSuffix changeInfixToSuffix;
+                string suffix = changeInfixToSuffix.changeInfixToSuffix(exp);
+                float ret = CalcExp::calcExp(suffix);
+                if ((23.99 <= ret) and (ret <= 24.01)) {
+                    cout << "exp: " << exp << "   suffix: " << suffix << "  ret: " << ret << endl;
+                    return true;
+                }
+            } while (next_permutation(cardPos, cardPos + cards.size()));
+
+        }
+        return false;
+    }
+public:
+    static void testOne(const vector<int>& cards) {
+        Tools::print(cards);
+        Calc24().calc24(cards);
+    }
+
+    static void test() {
+        Calc24().calcStringExp("3+(4+5+6)");
+
+        testOne({3, 4, 5, 6});
+        testOne({3, 3, 3, 3});
+        testOne({6, 7, 8, 9});
+    }
+
+    static void testStringExp() {
+        Calc24 calc24;
+        calc24.calcStringExp("3+2-1");             // 4
+        calc24.calcStringExp("3-2+1");             // 2
+        calc24.calcStringExp("(3+2)-1*0+(5)");     // 10
+
+        calc24.calcStringExp("2+(5)");             // 7
+        calc24.calcStringExp("(3+2)+(5))");        // 10
+        calc24.calcStringExp("(3+2)-(5))");        // 0
+        calc24.calcStringExp("(3+2)-1*0");         // 5
+        calc24.calcStringExp("9+(8-7)*6+5/4+(3+2)-1*0+(5)");   // 26
+        calc24.calcStringExp("9+(8-7)*6+5/4");     // 116
+        calc24.calcStringExp("A+(B-C/D)*E");
+        calc24.calcStringExp("1-(2+3)");           // -4
+        calc24.calcStringExp("a+b*c");
+        calc24.calcStringExp("a*b+c");
     }
 };
 
@@ -404,8 +543,8 @@ public:
 };
 
 int main(int argc, char** argv) {
-
-    snow_01::test();
+//    CreateFullPermutation::test();
+//    snow_01::test();
 
 //	float f = test();
 //	testVector();
@@ -417,7 +556,7 @@ int main(int argc, char** argv) {
 //	cin >> str;
 //	cout << matchBracket(str) << endl;
 
-//    Calc24::test();
+    Calc24::test();
 
     return 0;
 }
