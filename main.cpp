@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 #define arrLen(arr) ( sizeof(arr) / sizeof(arr[0]) )
@@ -168,7 +169,6 @@ bool matchBracket(string str) {
     }
     return s.size() == 0;
 }
-
 class Tools {
 public:
     static bool isOperand(char c) {
@@ -186,7 +186,24 @@ public:
     }
 
     static void readIntArray(vector<vector<int>>& ret) {
-        freopen("D:\\other_cjwlaptop\\install\\cppAlgorithm\\data\\in.txt","r", stdin);
+        const char* FILE_NAME = ".\\data\\in.txt";
+        const char* FILE_NAME2 = "..\\data\\in.txt";
+
+        const char* fileName = FILE_NAME;
+        std::ifstream inFile(FILE_NAME);
+        if (!inFile.is_open()) {
+            inFile = ifstream(FILE_NAME2);
+            if (inFile.is_open()) {
+                fileName = FILE_NAME2;
+            } else {
+                assert(false);
+                return;
+            }
+            inFile.close();
+        }
+        inFile.close();
+
+        freopen(fileName, "r", stdin);
         int r, c;
         cin >> r >> c;
         cin.get(); // skip the <Enter>
