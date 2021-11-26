@@ -1,3 +1,6 @@
+#define INPUT_FROM_FILE
+#define LOCAL_CODE
+
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -177,6 +180,9 @@ public:
     }
 
     static void print(const vector<vector<int>>& ret) {
+#ifndef LOCAL_CODE
+        return;
+#endif
         for (int i = 0; i < ret.size(); i++) {
             vector<int> row = ret.at(i);
             for (int j = 0; j < row.size(); j++) {
@@ -187,6 +193,9 @@ public:
     }
 
     static void print(const vector<int>& v) {
+#ifndef LOCAL_CODE
+        return;
+#endif
         for (int j = 0; j < v.size(); j++) {
             cout << v.at(j) << " ";
         }
@@ -194,6 +203,48 @@ public:
     }
 
     static void readIntArray(vector<vector<int>>& ret) {
+#ifdef INPUT_FROM_FILE
+        const char* FILE_NAME = ".\\data\\in.txt";
+        const char* FILE_NAME2 = "..\\data\\in.txt";
+
+        const char* fileName = FILE_NAME;
+        std::ifstream inFile(FILE_NAME);
+        if (!inFile.is_open()) {
+            inFile = ifstream(FILE_NAME2);
+            if (inFile.is_open()) {
+                fileName = FILE_NAME2;
+            } else {
+                assert(false);
+                return;
+            }
+            inFile.close();
+        }
+        inFile.close();
+
+        freopen(fileName, "r", stdin);
+#endif
+
+        int r, c;
+        scanf("%d",&r);
+        scanf("%d",&c);
+
+        int arr[r][c];
+        for(int i = 0; i < r; i++){
+            for (int j = 0; j < c; j++) {
+                scanf("%d", &(arr[i][j]));
+
+            }
+            vector<int> row;
+            row.insert(row.end(), arr[i], arr[i] + c);
+            ret.push_back(row);
+        }
+
+#ifdef INPUT_FROM_FILE
+        fclose(stdin);
+#endif
+    }
+
+    static void readIntArray2(vector<vector<int>>& ret) {
         const char* FILE_NAME = ".\\data\\in.txt";
         const char* FILE_NAME2 = "..\\data\\in.txt";
 
@@ -610,10 +661,75 @@ public:
 13 12 11 10 9
 */
 class snow_01 {
+private:
+    vector<vector<int>> mNodeMax;
+
 public:
-    static void run(vector<vector<int>>& data) {
-        cout << "snow_01" << endl;
+    void handleHelper(vector<vector<int>>& data, int r, int c, int rNext, int cNext) {
+        handleOneNode(data, rNext, cNext);
+        if (mNodeMax[r][c] < mNodeMax[rNext][cNext] + 1) {
+            mNodeMax[r][c] = mNodeMax[rNext][cNext] + 1;
+        }
+    }
+    void handleOneNode(vector<vector<int>>& data, int r, int c) {
+        if (mNodeMax[r][c] > 0) {
+            return;
+        }
+
+        mNodeMax[r][c] = 1; // init self path as 1
+
+        // try sibling nodes
+        int rNext = 0;
+        int cNext = 0;
+        rNext = r - 1; cNext = c; // up
+        if ((rNext >= 0) and (data[r][c] > data[rNext][cNext])) {
+            handleHelper(data, r, c, rNext, cNext);
+        }
+
+        rNext = r + 1; cNext = c; // down
+        if ((rNext < data.size()) and (data[r][c] > data[rNext][cNext])) {
+            handleHelper(data, r, c, rNext, cNext);
+        }
+
+        rNext = r; cNext = c + 1; // right
+        if ((cNext < data[0].size()) and (data[r][c] > data[rNext][cNext])) {
+            handleHelper(data, r, c, rNext, cNext);
+        }
+
+        rNext = r; cNext = c - 1; // left
+        if ((cNext >= 0) and (data[r][c] > data[rNext][cNext])) {
+            handleHelper(data, r, c, rNext, cNext);
+        }
+    }
+
+    void run(vector<vector<int>>& data) {
+//        cout << "snow_01" << endl;
         Tools::print(data);
+
+        // init data
+        vector<int> row;
+        row.resize(data[0].size(), 0);
+        for (int r = 0; r < data.size(); r++) {
+            mNodeMax.push_back(row);
+        }
+
+        for (int r = 0; r < data.size(); r++) {
+            vector<int> row = data.at(r);
+            for (int c = 0; c < row.size();c++) {
+                handleOneNode(data, r, c);
+            }
+        }
+
+        // find the max path
+        int maxPath = 0;
+        for (int r = 0; r < data.size(); r++) {
+            for (int c = 0; c < data[r].size();c++) {
+                if(mNodeMax[r][c] > maxPath) {
+                    maxPath = mNodeMax[r][c];
+                }
+            }
+        }
+        cout << maxPath << endl;
     }
     static void test() {
         vector<vector<int>> input;
@@ -623,36 +739,24 @@ public:
     }
 };
 
+
 int main(int argc, char** argv) {
-//    CreateFullPermutation::test();
-//    snow_01::test();
-
-//	float f = test();
-//	testVector();
-
-//    testStack();
-
-//	cout << matchBracket("((((( abc ))))())") << endl;
-//	string str;
-//	cin >> str;
-//	cout << matchBracket(str) << endl;
+    snow_01().test();
+    return 0;
 
     Calc24::test();
+    CreateFullPermutation::test();
+
+	float f = test();
+	testVector();
+
+    testStack();
+
+	cout << matchBracket("((((( abc ))))())") << endl;
+	string str;
+	cin >> str;
+	cout << matchBracket(str) << endl;
 
     return 0;
 }
 
-
-
-//	int* p = reinterpret_cast<int*>(&f);
-//	cout << "int* p = reinterpret_cast<int*>(&f)\n";
-//	cout << *p << "\n";	
-//	
-//	cout << setiosflags(ios::hex) << setiosflags(ios::uppercase) ;
-//    cout<<setiosflags(ios::left|ios::scientific);    //设置左对齐，以科学技术法显示 
-//    cout.precision(3);   //设置保留三位小数
-//	cout<<123.45678<<endl;
-//	
-//	cout << setiosflags(ios::hex) << p << "\n";	
-//	cout << setiosflags(ios::hex) << setiosflags(ios::uppercase) ;
-//	cout << *p << "\n";	
