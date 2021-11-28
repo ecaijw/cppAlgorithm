@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
 	cin >> str;
 	cout << matchBracket(str) << endl;
 
+//    snowJunyi();
     return 0;
 }
 

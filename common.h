@@ -35,6 +35,7 @@ extern bool matchBracket(string str);
 extern void shudu();
 extern void runSnow();
 extern void runCalc24();
+extern void snowJunyi();
 
 class CreateFullPermutation {
 private:
@@ -70,11 +71,15 @@ class Tools {
 public:
     static bool isOperand(char c);
 
+    static void forcePrint(int* a, int r, int c);
+    static void print(int* a, int r, int c);
+
     static void print(const vector<vector<int>> &ret);
 
     static void print(const vector<int> &v);
 
     static void readIntArray(vector<vector<int>> &ret);
+    static void readIntArray(vector<vector<int>>& ret, int r, int c, bool needReopenStdin = true);
 
     static void readIntArray2(vector<vector<int>> &ret);
 };

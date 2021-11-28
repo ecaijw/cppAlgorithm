@@ -14,8 +14,55 @@
 
 using namespace std;
 
+void reopenStdin() {
+#ifdef INPUT_FROM_FILE
+    const char* FILE_NAME = ".\\data\\in.txt";
+    const char* FILE_NAME2 = "..\\data\\in.txt";
+
+    const char* fileName = FILE_NAME;
+    std::ifstream inFile(FILE_NAME);
+    if (!inFile.is_open()) {
+        inFile = ifstream(FILE_NAME2);
+        if (inFile.is_open()) {
+            fileName = FILE_NAME2;
+        } else {
+            assert(false);
+            return;
+        }
+        inFile.close();
+    }
+    inFile.close();
+
+    freopen(fileName, "r", stdin);
+#endif
+}
+
+void closeStdin() {
+    #ifdef INPUT_FROM_FILE
+    fclose(stdin);
+    #endif
+}
+
 bool Tools::isOperand(char c) {
     return (('0' <= c) && (c <= '9')) || (('A' <= c) && (c <= 'Z')) || (('a' <= c) && (c <= 'z'));
+}
+
+void Tools::forcePrint(int* a, int r, int c) {
+            int* b = (int*)a;
+            for (int i = 0; i < r; i++) {
+                for (int j = 0; j < c; j++) {
+//            cout << a[i][j] << " ";
+            cout << b[i* r + j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void Tools::print(int* a, int r, int c) {
+#ifndef LOCAL_CODE
+    return;
+#endif
+    Tools::forcePrint((int*)a, r, c);
 }
 
 void Tools::print(const vector<vector<int>>& ret) {
@@ -42,30 +89,20 @@ void Tools::print(const vector<int>& v) {
 }
 
 void Tools::readIntArray(vector<vector<int>>& ret) {
-#ifdef INPUT_FROM_FILE
-    const char* FILE_NAME = ".\\data\\in.txt";
-    const char* FILE_NAME2 = "..\\data\\in.txt";
-
-    const char* fileName = FILE_NAME;
-    std::ifstream inFile(FILE_NAME);
-    if (!inFile.is_open()) {
-        inFile = ifstream(FILE_NAME2);
-        if (inFile.is_open()) {
-            fileName = FILE_NAME2;
-        } else {
-            assert(false);
-            return;
-        }
-        inFile.close();
-    }
-    inFile.close();
-
-    freopen(fileName, "r", stdin);
-#endif
+    reopenStdin();
 
     int r, c;
     scanf("%d",&r);
     scanf("%d",&c);
+
+    Tools::readIntArray(ret, r, c, false /* no need to reopen */);
+
+    closeStdin();
+
+}
+
+void Tools::readIntArray(vector<vector<int>>& ret, int r, int c, bool needReopenStdin) {
+    if (needReopenStdin) reopenStdin();
 
     int arr[r][c];
     for(int i = 0; i < r; i++){
@@ -78,9 +115,7 @@ void Tools::readIntArray(vector<vector<int>>& ret) {
         ret.push_back(row);
     }
 
-#ifdef INPUT_FROM_FILE
-    fclose(stdin);
-#endif
+    if (needReopenStdin) closeStdin();
 }
 
 void Tools::readIntArray2(vector<vector<int>>& ret) {
