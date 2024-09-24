@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -10,6 +9,7 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include <sstream>  // Include this header for std::istringstream
 #include "common.h"
 
 using namespace std;
@@ -17,7 +17,7 @@ using namespace std;
 void reopenStdin() {
 #ifdef INPUT_FROM_FILE
     const char* FILE_NAME = ".\\data\\in.txt";
-    const char* FILE_NAME2 = "..\\data\\in.txt";
+    const char* FILE_NAME2 = "../data/in.txt"; // for mac file
 
     const char* fileName = FILE_NAME;
     std::ifstream inFile(FILE_NAME);
@@ -38,9 +38,9 @@ void reopenStdin() {
 }
 
 void closeStdin() {
-    #ifdef INPUT_FROM_FILE
+#ifdef INPUT_FROM_FILE
     fclose(stdin);
-    #endif
+#endif
 }
 
 bool Tools::isOperand(char c) {
@@ -48,11 +48,10 @@ bool Tools::isOperand(char c) {
 }
 
 void Tools::forcePrint(int* a, int r, int c) {
-            int* b = (int*)a;
-            for (int i = 0; i < r; i++) {
-                for (int j = 0; j < c; j++) {
-//            cout << a[i][j] << " ";
-            cout << b[i* r + j] << " ";
+    int* b = (int*)a;
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            cout << b[i * r + j] << " ";
         }
         cout << endl;
     }
@@ -92,23 +91,21 @@ void Tools::readIntArray(vector<vector<int>>& ret) {
     reopenStdin();
 
     int r, c;
-    scanf("%d",&r);
-    scanf("%d",&c);
+    scanf("%d", &r);
+    scanf("%d", &c);
 
     Tools::readIntArray(ret, r, c, false /* no need to reopen */);
 
     closeStdin();
-
 }
 
 void Tools::readIntArray(vector<vector<int>>& ret, int r, int c, bool needReopenStdin) {
     if (needReopenStdin) reopenStdin();
 
     int arr[r][c];
-    for(int i = 0; i < r; i++){
+    for (int i = 0; i < r; i++) {
         for (int j = 0; j < c; j++) {
             scanf("%d", &(arr[i][j]));
-
         }
         vector<int> row;
         row.insert(row.end(), arr[i], arr[i] + c);

@@ -74,14 +74,14 @@ public:
     static void forcePrint(int* a, int r, int c);
     static void print(int* a, int r, int c);
 
-    static void print(const vector<vector<int>> &ret);
+    static void print(const vector<vector<int> > &ret);
 
     static void print(const vector<int> &v);
 
-    static void readIntArray(vector<vector<int>> &ret);
-    static void readIntArray(vector<vector<int>>& ret, int r, int c, bool needReopenStdin = true);
+    static void readIntArray(vector<vector<int> > &ret);
+    static void readIntArray(vector<vector<int> >& ret, int r, int c, bool needReopenStdin = true);
 
-    static void readIntArray2(vector<vector<int>> &ret);
+    static void readIntArray2(vector<vector<int> > &ret);
 };
 
 #endif

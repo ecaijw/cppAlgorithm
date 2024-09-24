@@ -15,9 +15,9 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-    shudu();
+    // shudu();
 
-    return 0;
+    // return 0;
 
 
     runCalc24();

@@ -28,17 +28,18 @@ public:
 
     bool calc24_1(const vector<int>& cards) {
         vector< vector<int> > pos;
+        int cardsSize = cards.size();
         int cardPos [] = {0, 1, 2, 3};
         do {
             vector<int> onePos;
             onePos.assign(cardPos, cardPos + 4);
             pos.push_back(onePos);
-        } while (next_permutation(cardPos, cardPos + cards.size()));
+        } while (next_permutation(cardPos, cardPos + cardsSize));
 
         // exp: (3*(4)*(5)*6)
         //      0/12/345/67/8
         //      2442324222412
-        //      Êý×Ö4*3*2  *  ÔËËã·û4*4*4  *  À¨ºÅ2*2*2*2*2*2
+        //      ï¿½ï¿½ï¿½ï¿½4*3*2  *  ï¿½ï¿½ï¿½ï¿½ï¿½4*4*4  *  ï¿½ï¿½ï¿½ï¿½2*2*2*2*2*2
         const vector<char> OPERATOR({'+', '-', '*', '/'});
         CreateFullPermutation creator;
         creator.init({2, 4, 2, 2, 4, 2, 2, 4, 2});
@@ -95,17 +96,18 @@ public:
 
     bool calc24(const vector<int>& cards) {
         vector< vector<int> > pos;
+        int cardsSize = cards.size();
         int cardPos [] = {0, 1, 2, 3};
         do {
             vector<int> onePos;
             onePos.assign(cardPos, cardPos + 4);
             pos.push_back(onePos);
-        } while (next_permutation(cardPos, cardPos + cards.size()));
+        } while (next_permutation(cardPos, cardPos + cardsSize));
 
         // exp: (3*(4)*(5)*6)
         //      0/12/345/67/8
         //      2442324222412
-        //      Êý×Ö4*3*2  *  ÔËËã·û4*4*4  *  À¨ºÅ2*2*2*2*2*2
+        //      ï¿½ï¿½ï¿½ï¿½4*3*2  *  ï¿½ï¿½ï¿½ï¿½ï¿½4*4*4  *  ï¿½ï¿½ï¿½ï¿½2*2*2*2*2*2
         const vector<char> OPERATOR({'+', '-', '*', '/'});
         for (int i0 = 0; i0 < 2;i0++)
             for (int i1 = 0; i1 < 4;i1++)
